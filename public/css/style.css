@@ -1,0 +1,163 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+#navbar {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
+
+#navbar a {
+    color: white;
+    padding: 0 15px;
+    text-decoration: none;
+}
+
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    overflow: auto;
+    background-color: #444;
+    padding-top: 20px;
+    transition: width 0.3s;
+}
+
+#sidebar.collapsed {
+    width: 40px; /* Adjust this width to match the arrow size */
+}
+
+#toggle-sidebar {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 0; /* Adjust to place the arrow outside the collapsed sidebar */
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Adjust as needed */
+    background: #444;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#sidebar.collapsed #toggle-sidebar {
+    right: 0;
+}
+
+/* Adjust the content in the sidebar when collapsed */
+#sidebar.collapsed a {
+    display: none; /* Hide the text links */
+}
+
+#sidebar a, #sidebar button {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+    display: block;
+}
+
+#sidebar a:hover {
+    background-color: #555;
+}
+
+#sidebar a:hover {
+    background-color: #555;
+}
+
+#canvas-container {
+    margin-left: 200px; /* Same as sidebar width */
+    margin-top: 60px; /* Approximate height of navbar */
+    height: calc(100% - 60px); /* Adjust height considering navbar */
+    overflow: hidden;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+#sidebar img {
+    height: 1.5cm; /* Set the height of the image */
+    width: auto; /* Maintain the aspect ratio of the image */
+    padding: 5px 0; /* Adds some padding around the images */
+    /* Add more styling as needed */
+}
+
+
+#sidebar .image-container {
+    text-align: center; /* Centers the content */
+    padding: 5px; /* Adjust padding around each container */
+}
+
+#sidebar img {
+    height: 80px; /* Set the height of the image */
+    width: auto; /* Maintain the aspect ratio of the image */
+    display: block; /* Set images as block elements */
+    margin: 0 auto; /* Center the image in the container */
+}
+
+#sidebar .image-title {
+    margin: 5px 0 0 0; /* Margin above the title, remove margins from other sides */
+    font-size: 14px; /* Adjust font size as needed */
+    color: #fff; /* Adjust text color as needed */
+    text-align: center; /* Center-align the title */
+}
+
+#config-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f1f1f1;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    display: none; /* Hide by default */
+    padding: 10px;
+    text-align: left;
+}
+
+#host-input {
+    padding: 8px;
+    margin: 5px 0;
+    width: calc(100% - 20px); /* Full width minus padding */
+    box-sizing: border-box; /* Make sure padding doesn't affect width */
+}
+
+.sidebar {
+    height: 100%;
+    width: 0; /* Sidebar width is initially 0 */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    right: 0; /* Position to the right */
+    background-color: #111; /* Black background color */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in or slide out the sidebar */
+    color: white; /* Text color */
+}
+
+.sidebar h2 {
+    padding-left: 15px;
+}
+
+#serverResponse {
+    white-space: pre-wrap; /* Since pre is used, this allows text to wrap */
+    word-wrap: break-word; /* Ensures the content breaks nicely */
+    padding: 10px 15px;
+    overflow-y: auto; /* Enable vertical scroll if needed */
+    height: 90%; /* Set height */
+    margin-bottom: 20px; /* Space at the bottom */
+}
+
+.product-image {
+    height: 50px;
+    width: auto;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Vise Framework</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+    <div id="navbar">
+
+        <!-- Navbar content -->
+        <a href="#">Home</a>
+        <a href="#">Config</a>
+        <button id="simulateButton">Send</button>
+        <!-- More navbar items -->
+    </div>
+
+    <div id="sidebar">
+        <button id="toggle-sidebar">&#x3c;</button>
+        <!-- Sidebar content -->
+        <img src="assets/images/house.png" id="draggableHouse" size="20%" draggable="true" alt="Image 1">
+        <p class="image-title">House</p>
+        <img src="assets/images/hotel.png" id="draggableHotel" size="20%" draggable="true" alt="Image 1">
+        <p class="image-title">Hotel</p>
+        <!-- More sidebar items -->
+    </div>
+    <div id="responseSidebar" class="sidebar">
+        <h2>Server Response</h2>
+        <pre id="serverResponse">Response will appear here...</pre>
+    </div>
+    <div id="config-panel">
+        <label for="host-input">Host</label>
+        <input type="text" id="host-input" placeholder="Enter host address">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="bundle.js"></script>
+</body>
+
+</html>
