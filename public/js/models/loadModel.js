@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { renderer } from './rendererSetup.js'; 
+
 
 // Function to load a model into the scene at a specific position and scale
 function loadModel(scene, modelPath, position, scale, type) {
@@ -7,14 +9,14 @@ function loadModel(scene, modelPath, position, scale, type) {
     loader.load(modelPath, (gltf) => {
         gltf.scene.position.copy(position);
         gltf.scene.scale.set(scale.x, scale.y, scale.z);
-        gltf.scene.userData.type = type; // Tag the model with its type, like 'house' or 'hotel'
+        gltf.scene.userData.type = type;
         scene.add(gltf.scene);
     }, undefined, (error) => {
         console.error('An error happened:', error);
     });
 }
 
-export function setupModelLoader(scene, camera, renderer) {
+export function setupModelLoader(scene, camera) {
     // Assuming a horizontal plane for dropping objects
     const planeNormal = new THREE.Vector3(0, 1, 0);
     const plane = new THREE.Plane(planeNormal, 0);
