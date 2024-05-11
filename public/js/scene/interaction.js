@@ -1,28 +1,29 @@
-// scene/interaction.js
+// interaction.js
 import { scene, camera, renderer } from './setup';
+import * as THREE from 'three';
+
 let isDragging = false;
 let dragStartPosition = new THREE.Vector2();
 let selectedObject = null;
+let isSpacebarPressed = false;
 
 function enableDragControls() {
-    window.addEventListener('keydown', function(event) {
-        if (event.code === 'Space') {
-            renderer.domElement.addEventListener('mousedown', onMouseDown, false);
-            window.addEventListener('mouseup', onMouseUp, false);
-            window.addEventListener('mousemove', onMouseMove, false);
-        }
-    });
+    renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+    window.addEventListener('mousemove', onMouseMove, false);
+    window.addEventListener('mouseup', onMouseUp, false);
+}
 
-    window.addEventListener('keyup', function(event) {
-        if (event.code === 'Space') {
-            renderer.domElement.removeEventListener('mousedown', onMouseDown, false);
-            window.removeEventListener('mouseup', onMouseUp, false);
-            window.removeEventListener('mousemove', onMouseMove, false);
-        }
-    });
+function disableDragControls() {
+    renderer.domElement.removeEventListener('mousedown', onMouseDown, false);
+    window.removeEventListener('mousemove', onMouseMove, false);
+    window.removeEventListener('mouseup', onMouseUp, false);
+    isDragging = false;
+    selectedObject = null;
 }
 
 function onMouseDown(event) {
+    if (!isSpacebarPressed) return;
+
     const mouse = new THREE.Vector2(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1
@@ -31,14 +32,10 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
 
-    if (intersects.length > 0) {
-        const object = intersects[0].object;
-
-        if (object.userData.draggable) {
-            selectedObject = object;
-            isDragging = true;
-            dragStartPosition.set(event.clientX, event.clientY);
-        }
+    if (intersects.length > 0 && intersects[0].object.userData.draggable) {
+        selectedObject = intersects[0].object;
+        isDragging = true;
+        dragStartPosition.set(event.clientX, event.clientY);
     }
 }
 
@@ -49,7 +46,7 @@ function onMouseMove(event) {
     const dy = event.clientY - dragStartPosition.y;
 
     selectedObject.position.x += dx * 0.01;
-    selectedObject.position.z -= dy * 0.01; // Assuming the plane is on the XZ axis
+    selectedObject.position.z -= dy * 0.01;
 
     dragStartPosition.set(event.clientX, event.clientY);
 }
@@ -58,4 +55,17 @@ function onMouseUp(event) {
     isDragging = false;
 }
 
-export { enableDragControls };
+// Keyboard event listeners to toggle drag controls based on the spacebar
+window.addEventListener('keydown', function(event) {
+    if (event.code === 'Space') {
+        isSpacebarPressed = true;
+        enableDragControls();
+    }
+});
+
+window.addEventListener('keyup', function(event) {
+    if (event.code === 'Space') {
+        isSpacebarPressed = false;
+        disableDragControls();
+    }
+});

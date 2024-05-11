@@ -7,6 +7,7 @@ import { renderer } from './rendererSetup.js';
 function loadModel(scene, modelPath, position, scale, type) {
     const loader = new GLTFLoader();
     loader.load(modelPath, (gltf) => {
+        console.log(gltf);
         gltf.scene.position.copy(position);
         gltf.scene.scale.set(scale.x, scale.y, scale.z);
         gltf.scene.userData.type = type;
