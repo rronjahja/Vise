@@ -69,6 +69,7 @@ renderer.domElement.addEventListener('mousemove', function (event) {
 
     if (raycaster.ray.intersectPlane(plane, intersectPoint)) {
         selectedObject.position.copy(intersectPoint);
+        updateCoordinates();
     }
 });
 
@@ -95,13 +96,11 @@ renderer.domElement.addEventListener('dblclick', function (event) {
             selectedObject = selectedObject.parent;
         }
         console.log(selectedObject.userData);
-        // if (selectedObject.userData.type === 'house' || selectedObject.userData.type === 'hotel' || selectedObject.userData.type === 'hangar') {
-        //     showMessage(selectedObject.userData.type.charAt(0).toUpperCase() + selectedObject.userData.type.slice(1), intersects[0].point);
-        // }
     }
 });
 
 function onDrop(event, modelType) {
+    console.log("onDrop called with modelType:", modelType);
     let rect = renderer.domElement.getBoundingClientRect();
     let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -113,6 +112,7 @@ function onDrop(event, modelType) {
     if (intersects.length > 0) {
         const point = intersects[0].point;
         const modelData = getModelData(modelType);
+        console.log("Model data:", modelData);
         if (modelData.fileName) {
             const scale = determineScale(modelData.type);
             loadModel(modelData.fileName, point, scale, modelData.type);
@@ -120,6 +120,7 @@ function onDrop(event, modelType) {
             selectedObject.position.copy(point);
             selectedObject = null;
         }
+        updateCoordinates();
     }
 }
 
@@ -135,22 +136,129 @@ function getModelData(modelType) {
 
 function loadModel(modelName, position, scale, type) {
     const fullPath = `assets/models/${modelName}`;
+    console.log("Loading model from:", fullPath);
     loader.load(fullPath, function (gltf) {
         gltf.scene.position.copy(position);
         gltf.scene.scale.set(scale.x, scale.y, scale.z);
         gltf.scene.userData.type = type;
+        gltf.scene.name = type;  // Ensure the name is set for easy reference
         scene.add(gltf.scene);
+        updateCoordinates();
     }, undefined, function (error) {
         console.error(`An error happened loading the GLB file from ${fullPath}:`, error);
     });
 }
 
-function openModal(type, position) {
-    const vector = position.clone().project(camera);
-    const x = (vector.x * 0.5 + 0.5) * renderer.domElement.clientWidth;
-    const y = (vector.y * -0.5 + 0.5) * renderer.domElement.clientHeight;
-    const modal = document.getElementById('infoModal');
+function animateTruck(startPoint, endPoint) {
+    const truck = scene.getObjectByName('truck');
+    if (!truck) {
+        console.error('Truck model not found in the scene.');
+        return;
+    }
+
+    truck.scale.set(0.3, 0.3, 0.3);
+    truck.position.y = -0.5;
+    truck.rotation.y = Math.PI / 2;
+
+    if (!startPoint || !endPoint) {
+        console.error('Start point or end point not set.');
+        return;
+    }
+
+    let traveled = 0;
+    const delta = new THREE.Vector3().subVectors(endPoint, startPoint);
+    const distance = delta.length();
+    const direction = delta.normalize();
+    const speed = 0.7;
+
+    truck.visible = true;
+    truck.position.set(startPoint.x, startPoint.y, startPoint.z);
+    truck.rotation.y = Math.atan2(endPoint.x - startPoint.x, endPoint.z - startPoint.z) - Math.PI / 2 + Math.PI;
+
+    if (window.currentAnimationId) {
+        cancelAnimationFrame(window.currentAnimationId);
+    }
+
+    function animate() {
+        if (traveled < distance) {
+            window.currentAnimationId = requestAnimationFrame(animate);
+            truck.position.addScaledVector(direction, speed);
+            traveled += speed;
+        } else {
+            cancelAnimationFrame(window.currentAnimationId);
+            truck.visible = false;
+        }
+    }
+
+    animate();
 }
+
+function updateCoordinates() {
+    console.log("Updating coordinates...");
+    const hangar = scene.getObjectByName('hangar');
+    const hotel = scene.getObjectByName('hotel');
+    const house = scene.getObjectByName('house');
+
+    let coordinates = {
+        hangar: null,
+        hotel: null,
+        house: null
+    };
+
+    if (hangar) {
+        coordinates.hangar = new THREE.Vector3(
+            hangar.position.x,
+            hangar.position.y,
+            hangar.position.z
+        );
+        console.log("Dispatching coordinatesUpdated event for hangar:", coordinates.hangar);
+    } else {
+        console.log("Hangar not found.");
+    }
+
+    if (hotel) {
+        coordinates.hotel = new THREE.Vector3(
+            hotel.position.x,
+            hotel.position.y,
+            hotel.position.z
+        );
+        console.log("Dispatching coordinatesUpdated event for hotel:", coordinates.hotel);
+    } else {
+        console.log("Hotel not found.");
+    }
+
+    if (house) {
+        coordinates.house = new THREE.Vector3(
+            house.position.x,
+            house.position.y,
+            house.position.z
+        );
+        console.log("Dispatching coordinatesUpdated event for house:", coordinates.house);
+    } else {
+        console.log("House not found.");
+    }
+
+    document.dispatchEvent(new CustomEvent('coordinatesUpdated', {
+        detail: coordinates
+    }));
+
+    return coordinates;
+}
+
+// Listen for the fieldValueExtracted event and start the truck animation
+document.addEventListener('fieldValueExtracted', function(event) {
+    console.log('fieldValueExtracted event fired.');
+    const { fieldNameOrigin, fieldValue } = event.detail;
+    console.log(`Field Value Extracted: ${fieldNameOrigin} - ${fieldValue}`);
+
+    const coordinates = updateCoordinates();
+    
+    if (coordinates.hangar && coordinates.hotel) {
+        animateTruck(coordinates.hangar, coordinates.hotel); // Ensure these are THREE.Vector3 objects
+    } else {
+        console.error('Coordinates for hangar or hotel are missing.');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     const closeButton = document.querySelector('.modal-close');
@@ -159,8 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('sendButton').addEventListener('click', function () {
-        // Implement what happens when the 'Get' button is clicked
-        console.log("HEh")
+        console.log("HEh");
     });
 
     let startPoint = null;
@@ -221,31 +328,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        let traveled = 0;
-        const delta = new THREE.Vector3().subVectors(endPoint, startPoint);
-        const distance = delta.length();
-        const direction = delta.normalize();
-        const speed = 0.7;
-
-        truck.visible = true;
-        truck.position.set(startPoint.x, startPoint.y, startPoint.z);
-        truck.rotation.y = Math.atan2(endPoint.x - startPoint.x, endPoint.z - startPoint.z) - Math.PI / 2 + Math.PI;
-
-        if (window.currentAnimationId) {
-            cancelAnimationFrame(window.currentAnimationId);
-        }
-
-        function animateTruck() {
-            if (traveled < distance) {
-                window.currentAnimationId = requestAnimationFrame(animateTruck);
-                truck.position.addScaledVector(direction, speed);
-                traveled += speed;
-            } else {
-                cancelAnimationFrame(window.currentAnimationId);
-                truck.visible = false;
-            }
-        }
-
-        animateTruck();
+        animateTruck(startPoint, endPoint);
     });
 });
+
+export { scene, animateTruck };

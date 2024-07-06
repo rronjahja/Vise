@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOMContentLoaded event fired.');
+
     const scanPdfBtn = document.getElementById('scanPdfBtn');
     const scanPdfModal = document.getElementById('scanPdfModal');
     const scanPdfClose = scanPdfModal.querySelector('.modal-close');
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
     startScanButton.addEventListener('click', function() {
         if (uploadedImage) {
             uploadedImage.onload = function() {
+                scanPdfModal.style.display = 'none';
                 canvas.width = uploadedImage.width;
                 canvas.height = uploadedImage.height;
                 ctx.drawImage(uploadedImage, 0, 0);
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
             canvas,
             'eng',
             {
-                logger: m => console.log(m)
+                // logger: m => console.log(m)
             }
         ).then(({ data: { text } }) => {
             console.log("OCR Text:", text);
@@ -69,10 +72,27 @@ document.addEventListener('DOMContentLoaded', function () {
             if (parts.length > 1) {
                 let fieldValue = parts[1].trim();
                 fieldValueDisplay.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: ${fieldValue}`;
-                document.dispatchEvent(new CustomEvent('fieldValueExtracted', { detail: { fieldNameOrigin,fieldValue } }));
+                document.dispatchEvent(new CustomEvent('fieldValueExtracted', { detail: { fieldNameOrigin, fieldValue } }));
             }
         } else {
             fieldValueDisplay.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: Not Found`;
         }
     }
+
+    // Add the coordinatesUpdated event listener outside of the function
+    document.addEventListener('coordinatesUpdated', function (event) {
+        console.log('coordinatesUpdated event fired.');
+        const { type, coordinates } = event.detail;
+        // console.log(`Event received: ${type.charAt(0).toUpperCase() + type.slice(1)} Position: ${coordinates.x}, ${coordinates.y}, ${coordinates.z}`);
+        
+        // Update the UI with coordinates
+        const coordinatesDisplay = document.getElementById('coordinates-display');
+        if (coordinatesDisplay) {
+            // coordinatesDisplay.textContent = `Type: ${type.charAt(0).toUpperCase() + type.slice(1)}, Position: X=${coordinates.x.toFixed(2)}, Y=${coordinates.y.toFixed(2)}, Z=${coordinates.z.toFixed(2)}`;
+        } else {
+            console.warn('Coordinates display element not found.');
+        }
+    });
+
+    console.log('coordinatesUpdated event listener added.');
 });
