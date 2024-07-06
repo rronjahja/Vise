@@ -8,14 +8,14 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.js$/, // Apply this rule to JavaScript files
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader', // Use Babel to transpile JavaScript files
-          options: {
-            presets: ['@babel/preset-env'],
-          },
+     {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
         },
       },
     ],

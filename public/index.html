@@ -6,16 +6,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
     <div id="navbar">
-
         <!-- Navbar content -->
         <a href="#">Home</a>
-        <a href="#">Config</a>
-        <button id="simulateButton">Send</button>
+        <a href="#" id="configButton">Config</a>
+        <button style="width:auto;background-color:darkslategrey;" id="simulateButton">Simulate</button>
+        <button style="width:auto;background-color:steelblue;" id="scanPdfBtn">Scan PDF</button>
         <!-- More navbar items -->
     </div>
 
@@ -26,6 +25,8 @@
         <p class="image-title">House</p>
         <img src="assets/images/hotel.png" id="draggableHotel" size="20%" draggable="true" alt="Image 1">
         <p class="image-title">Hotel</p>
+        <img src="assets/images/hangar.png" id="draggableHangar" size="15%" draggable="true" alt="Image 1">
+        <p class="image-title">Hangar</p>
         <!-- More sidebar items -->
     </div>
     <div id="responseSidebar" class="sidebar">
@@ -36,12 +37,49 @@
         <label for="host-input">Host</label>
         <input type="text" id="host-input" placeholder="Enter host address">
     </div>
-    <script src="./js/controls/modalLogic.js"></script>
+    <!-- <div id="infoModal" class="modal" style="display: none;">
+        <button class="modal-close">&times;</button>
+        <h3>Object Information</h3>
+        <form>
+            <input id="urlInput" type="text" placeholder="Url - https://">
+            <input id="endpoint" type="text" placeholder="Endpoint">
+            <button type="button" id="sendButton">Get</button>
+        </form>
+    </div> -->
+
+    <!-- New Modal for Scan PDF -->
+    <div id="scanPdfModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Upload PDF</h3>
+            <input type="file" id="image-input" accept="image/*">
+            <input type="text" id="fieldNameInput" placeholder="Enter field name">
+            <button id="startScanButton">Scan</button>
+            <canvas id="image-canvas" style="display:none;"></canvas>
+            <div id="fiscal-number">Field Value: </div>
+        </div>
+    </div>
+
+    <div id="footerConfigPanel" class="footer-panel">
+        <div id="footerToggle" class="footer-toggle">&#x25B2; Configurations</div>
+        <div id="footerContent" class="footer-content">
+            <button class="modal-close" id="footerClose">&times;</button>
+            <h3>Page Configurations</h3>
+            <form>
+                <input id="urlInputFooter" type="text" placeholder="Url - https://" value="https://services.odata.org/northwind/northwind.svc">
+                <input id="endpointFooter" type="text" placeholder="Endpoint" value="Orders">
+                <button type="button" id="sendButton">Get</button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2"></script>
     <script src="bundle.js"></script>
-
+    <script src="js/scanPdf.js"></script>
+    <script src="js/messageModule.js"></script>
 </body>
 
 </html>
