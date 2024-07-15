@@ -5,7 +5,8 @@
     <title>Vise Framework</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
 
 <body>
@@ -15,18 +16,22 @@
         <a href="#" id="configButton">Config</a>
         <button style="width:auto;background-color:darkslategrey;" id="simulateButton">Simulate</button>
         <button style="width:auto;background-color:steelblue;" id="scanPdfBtn">Scan PDF</button>
+        <label for="view3DCheckbox"> 3D</label>
+        <input type="checkbox" id="view3DCheckbox">
         <!-- More navbar items -->
     </div>
 
     <div id="sidebar">
         <button id="toggle-sidebar">&#x3c;</button>
         <!-- Sidebar content -->
-        <img src="assets/images/house.png" id="draggableHouse" size="20%" draggable="true" alt="Image 1">
+        <img src="assets/images/house.png" id="draggableHouse" size="20%" draggable="true" alt="House">
         <p class="image-title">House</p>
-        <img src="assets/images/hotel.png" id="draggableHotel" size="20%" draggable="true" alt="Image 1">
+        <img src="assets/images/hotel.png" id="draggableHotel" size="20%" draggable="true" alt="Hotel">
         <p class="image-title">Hotel</p>
-        <img src="assets/images/hangar.png" id="draggableHangar" size="15%" draggable="true" alt="Image 1">
+        <img src="assets/images/hangar.png" id="draggableHangar" size="10%" draggable="true" alt="Hangar">
         <p class="image-title">Hangar</p>
+        <img src="assets/images/manufacturing.png" id="draggableManufacturing" draggable="true" alt="Manufacturing">
+        <p class="image-title">Manufacturing</p>
         <!-- More sidebar items -->
     </div>
     <div id="responseSidebar" class="sidebar">
@@ -39,18 +44,8 @@
     </div>
     <div id="loading-screen" style="display: none;">Loading...</div>
 
-    <!-- <div id="infoModal" class="modal" style="display: none;">
-        <button class="modal-close">&times;</button>
-        <h3>Object Information</h3>
-        <form>
-            <input id="urlInput" type="text" placeholder="Url - https://">
-            <input id="endpoint" type="text" placeholder="Endpoint">
-            <button type="button" id="sendButton">Get</button>
-        </form>
-    </div> -->
-
-    <!-- New Modal for Scan PDF -->
-    <div id="scanPdfModal" class="modal" style="display: none;">
+    <!-- Input Modal Structure -->
+    <div id="scanPdfModal" class="input-modal" style="display: none;">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <h3>Upload PDF</h3>
@@ -59,6 +54,16 @@
             <button id="startScanButton">Scan</button>
             <canvas id="image-canvas" style="display:none;"></canvas>
             <div id="fiscal-number">Field Value: </div>
+        </div>
+    </div>
+
+    <!-- 3D Model Modal Structure -->
+    <div id="infoModal" class="model-modal" style="display: none;">
+        <div class="model-modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="model-canvas-container">
+                <canvas id="modalCanvas"  width="800" height="600"></canvas>
+            </div>
         </div>
     </div>
 

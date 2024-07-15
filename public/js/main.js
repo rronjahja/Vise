@@ -1,5 +1,7 @@
 import { animate } from './scene.js';
-import './userInteractions.js'; // this script will automatically execute and bind event listeners
+import './userInteractions.js';
+import './messageModule.js';
+import { showModal } from './modal.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     animate(); // Start the animation loop when the DOM is fully loaded

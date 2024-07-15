@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     startScanButton.addEventListener('click', function() {
+//   alert("Hi");
         if (uploadedImage) {
             uploadedImage.onload = function() {
                 scanPdfModal.style.display = 'none';
@@ -67,15 +68,25 @@ document.addEventListener('DOMContentLoaded', function () {
         const fieldName = fieldNameInput.value.toLowerCase();
         const lines = text.split('\n');
         const fieldLine = lines.find(line => line.toLowerCase().includes(fieldName));
+        console.log("AVC: " + fieldLine);
+        
         if (fieldLine) {
-            const parts = fieldLine.split(':');
+            const parts = fieldLine.toLowerCase().split(fieldName);
             if (parts.length > 1) {
-                let fieldValue = parts[1].trim();
-                fieldValueDisplay.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: ${fieldValue}`;
-                document.dispatchEvent(new CustomEvent('fieldValueExtracted', { detail: { fieldNameOrigin, fieldValue } }));
+                const valuePart = parts[1].trim(); // Get the part after the field name
+                const fieldValue = valuePart.split(/[\s,:]/).find(part => /^\d+$/.test(part)); // Find the first number
+                
+                if (fieldValue) {
+                    fieldValueDisplay.textContent = `${fieldNameOrigin.charAt(0).toUpperCase() + fieldNameOrigin.slice(1)}: ${fieldValue}`;
+                    document.dispatchEvent(new CustomEvent('fieldValueExtracted', { detail: { fieldNameOrigin, fieldValue } }));
+                } else {
+                    fieldValueDisplay.textContent = `${fieldNameOrigin.charAt(0).toUpperCase() + fieldNameOrigin.slice(1)}: Not Found`;
+                }
+            } else {
+                fieldValueDisplay.textContent = `${fieldNameOrigin.charAt(0).toUpperCase() + fieldNameOrigin.slice(1)}: Not Found`;
             }
         } else {
-            fieldValueDisplay.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: Not Found`;
+            fieldValueDisplay.textContent = `${fieldNameOrigin.charAt(0).toUpperCase() + fieldNameOrigin.slice(1)}: Not Found`;
         }
     }
 

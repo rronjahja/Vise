@@ -1,10 +1,16 @@
 import * as THREE from 'three';
 import { camera, controls, renderer, scene, planeMesh, loader } from './scene.js';
+import { showModal } from './modal.js';
+import { animateTruck } from './animate.js';
 import { showMessage } from './messageModule.js';
 
 let isDragging = false;
 let selectedObject = null;
 let isSpacebarPressed = false;
+
+const view3DCheckbox = document.getElementById('view3DCheckbox');
+
+
 
 renderer.domElement.addEventListener('dragover', event => event.preventDefault());
 
@@ -46,7 +52,7 @@ renderer.domElement.addEventListener('mousedown', event => {
         while (object.parent !== null && object.parent !== scene) {
             object = object.parent;
         }
-        if (object.userData.type === 'house' || object.userData.type === 'hotel' || object.userData.type === 'hangar') {
+        if (object.userData.type === 'house' || object.userData.type === 'hotel' || object.userData.type === 'hangar' || object.userData.type === 'manufacturing') {
             selectedObject = object;
             controls.enabled = false;
             isDragging = true;
@@ -82,28 +88,34 @@ renderer.domElement.addEventListener('mouseup', function (event) {
 });
 
 renderer.domElement.addEventListener('dblclick', function (event) {
-    const mouse = new THREE.Vector2(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-    );
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
-
-    if (intersects.length > 0) {
-        selectedObject = intersects[0].object;
-        while (selectedObject.parent !== null && selectedObject.parent !== scene) {
-            selectedObject = selectedObject.parent;
+   
+        const mouse = new THREE.Vector2(
+            (event.clientX / window.innerWidth) * 2 - 1,
+            -(event.clientY / window.innerHeight) * 2 + 1
+        );
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        if (intersects.length > 0) {
+            selectedObject = intersects[0].object;
+            while (selectedObject.parent !== null && selectedObject.parent !== scene) {
+                selectedObject = selectedObject.parent;
+            }
+            if (view3DCheckbox.checked) {
+            showModal(selectedObject.userData);
         }
-        console.log(selectedObject.userData);
+        else{
+            // showModal(selectedObject.userData);
+        }
     }
+
 });
 
 function onDrop(event, modelType) {
     console.log("onDrop called with modelType:", modelType);
     let rect = renderer.domElement.getBoundingClientRect();
     let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    let y = -((event.clientY / rect.height) * 2 - 1);
 
     let raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
@@ -125,12 +137,23 @@ function onDrop(event, modelType) {
 }
 
 function determineScale(modelName) {
-    return modelName.includes("house") ? { x: 6, y: 6, z: 6 } : { x: 2, y: 2, z: 2 };
+    if (modelName.includes("house")) {
+        return { x: 6, y: 6, z: 6 };
+    } else if (modelName.includes("manufacturing")) {
+        return { x: 1, y: 1, z: 1 };
+    } else {
+        return { x: 2, y: 2, z: 2 };
+    }
 }
 
 function getModelData(modelType) {
     const baseName = modelType.split('/').pop().split('.')[0];
-    const fileName = baseName.endsWith('.glb') ? baseName : `${baseName}.glb`;
+    let fileName;
+    if (baseName.includes("manufacturing")) {
+        fileName = 'factory/manufacturing.gltf';
+    } else {
+        fileName = baseName.endsWith('.glb') ? baseName : `${baseName}.glb`;
+    }
     return { fileName, type: baseName };
 }
 
@@ -145,52 +168,8 @@ function loadModel(modelName, position, scale, type) {
         scene.add(gltf.scene);
         updateCoordinates();
     }, undefined, function (error) {
-        console.error(`An error happened loading the GLB file from ${fullPath}:`, error);
+        console.error(`An error happened loading the GLTF file from ${fullPath}:`, error);
     });
-}
-
-function animateTruck(startPoint, endPoint) {
-    const truck = scene.getObjectByName('truck');
-    if (!truck) {
-        console.error('Truck model not found in the scene.');
-        return;
-    }
-
-    truck.scale.set(0.3, 0.3, 0.3);
-    truck.position.y = -0.5;
-    truck.rotation.y = Math.PI / 2;
-
-    if (!startPoint || !endPoint) {
-        console.error('Start point or end point not set.');
-        return;
-    }
-
-    let traveled = 0;
-    const delta = new THREE.Vector3().subVectors(endPoint, startPoint);
-    const distance = delta.length();
-    const direction = delta.normalize();
-    const speed = 0.7;
-
-    truck.visible = true;
-    truck.position.set(startPoint.x, startPoint.y, startPoint.z);
-    truck.rotation.y = Math.atan2(endPoint.x - startPoint.x, endPoint.z - startPoint.z) - Math.PI / 2 + Math.PI;
-
-    if (window.currentAnimationId) {
-        cancelAnimationFrame(window.currentAnimationId);
-    }
-
-    function animate() {
-        if (traveled < distance) {
-            window.currentAnimationId = requestAnimationFrame(animate);
-            truck.position.addScaledVector(direction, speed);
-            traveled += speed;
-        } else {
-            cancelAnimationFrame(window.currentAnimationId);
-            truck.visible = false;
-        }
-    }
-
-    animate();
 }
 
 function updateCoordinates() {
@@ -198,11 +177,13 @@ function updateCoordinates() {
     const hangar = scene.getObjectByName('hangar');
     const hotel = scene.getObjectByName('hotel');
     const house = scene.getObjectByName('house');
+    const manufacturing = scene.getObjectByName('manufacturing');
 
     let coordinates = {
         hangar: null,
         hotel: null,
-        house: null
+        house: null,
+        manufacturing: null
     };
 
     if (hangar) {
@@ -238,6 +219,17 @@ function updateCoordinates() {
         console.log("House not found.");
     }
 
+    if (manufacturing) {
+        coordinates.manufacturing = new THREE.Vector3(
+            manufacturing.position.x,
+            manufacturing.position.y,
+            manufacturing.position.z
+        );
+        console.log("Dispatching coordinatesUpdated event for manufacturing:", coordinates.manufacturing);
+    } else {
+        console.log("Manufacturing not found.");
+    }
+
     document.dispatchEvent(new CustomEvent('coordinatesUpdated', {
         detail: coordinates
     }));
@@ -246,13 +238,13 @@ function updateCoordinates() {
 }
 
 // Listen for the fieldValueExtracted event and start the truck animation
-document.addEventListener('fieldValueExtracted', function(event) {
+document.addEventListener('fieldValueExtracted', function (event) {
     console.log('fieldValueExtracted event fired.');
     const { fieldNameOrigin, fieldValue } = event.detail;
     console.log(`Field Value Extracted: ${fieldNameOrigin} - ${fieldValue}`);
 
     const coordinates = updateCoordinates();
-    
+
     if (coordinates.hangar && coordinates.hotel) {
         animateTruck(coordinates.hangar, coordinates.hotel); // Ensure these are THREE.Vector3 objects
     } else {
@@ -329,7 +321,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         animateTruck(startPoint, endPoint);
+
+        // Fetch and load products after animation
+        const urlInput = document.getElementById('urlInputFooter').value.trim();
+        const endpointInput = document.getElementById('endpointFooter').value.trim();
+        const fullUrl = `${urlInput}/${endpointInput}?$filter=OrderID eq ${fieldValue}`;
+
+        if (urlInput && endpointInput) {
+            processFieldValue(fullUrl);
+        }
     });
 });
-
-export { scene, animateTruck };

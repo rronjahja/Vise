@@ -21,12 +21,21 @@ export const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.rotation.x = -Math.PI / 2;
 scene.add(planeMesh);
 
-const gridHelper = new THREE.GridHelper(500, 50);
+const gridHelper = new THREE.GridHelper(500, 100);
 scene.add(gridHelper);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(1, 1, 1);
 scene.add(directionalLight);
+
+// Adding the new Point Light
+const pointLight = new THREE.PointLight(0xffffff, 1, 100); // color, intensity, distance
+pointLight.position.set(10, 10, 10); // Adjust position as needed
+scene.add(pointLight);
+
+// Optional: Add a PointLightHelper to visualize the light position
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 1); // size of the helper
+scene.add(pointLightHelper);
 
 export function animate() {
     requestAnimationFrame(animate);
