@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Layout</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #scroll-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: scroll;
+            position: relative;
+            cursor: grab;
+        }
+        #container {
+            width: 200vw;
+            height: 200vh;
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .storage-type {
+            border: 2px solid #333;
+            margin: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            display: inline-block;
+            vertical-align: top;
+            width: fit-content;
+            height: fit-content;
+        }
+        .storage-bin {
+            border: 2px dashed #666;
+            margin: 10px;
+            padding: 10px;
+            background-color: #fff;
+            display: inline-block;
+            width: fit-content;
+            height: fit-content;
+        }
+        .product {
+            margin: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            width: fit-content;
+            height: fit-content;
+        }
+        .highlight {
+            background-color: red;
+        }
+        .highlight-bin {
+            background-color: blue;
+        }
+        .highlight-product {
+            background-color: green;
+        }
+        .search-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            z-index: 10;
+        }
+        .search-container input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="search-storage-type" placeholder="Search Storage Type">
+        <input type="text" id="search-storage-bin" placeholder="Search Storage Bin">
+        <input type="text" id="search-product" placeholder="Search Product">
+    </div>
+    <div id="scroll-container">
+        <div id="container"></div>
+    </div>
+
+    <script>
+        const data = [
+            // Your JSON data here
+        ];
+
+        const container = document.getElementById('container');
+
+        const createGridStyle = (count) => {
+            if (count <= 3) return `repeat(${count}, 1fr)`;
+            const gridSize = Math.ceil(Math.sqrt(count));
+            return `repeat(${gridSize}, 1fr)`;
+        };
+
+        const addProductsToBin = (products, binElement) => {
+            if (products.length > 3) {
+                const gridStyle = createGridStyle(products.length);
+                binElement.style.display = 'grid';
+                binElement.style.gridTemplateColumns = gridStyle;
+            } else {
+                binElement.style.display = 'block';
+            }
+
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('product');
+                productDiv.setAttribute('data-product', product.Product);
+                productDiv.innerHTML = `
+                    <p>Product: ${product.Product}</p>
+                    <p>Description: ${product["Product Description"]}</p>
+                    <p>Quantity: ${product.Quantity} ${product["Base Unit of Measure"]}</p>
+                    <p>Weight: ${product["Loading Weight"]} ${product["Weight Unit"]}</p>
+                `;
+                binElement.appendChild(productDiv);
+            });
+        };
+
+        const addBinsToStorageType = (bins, storageTypeElement) => {
+            const binsContainer = document.createElement('div');
+            const gridStyle = createGridStyle(bins.length);
+            binsContainer.style.display = 'grid';
+            binsContainer.style.gridTemplateColumns = gridStyle;
+            binsContainer.style.gap = '5px';
+
+            bins.forEach(bin => {
+                const storageBinSection = document.createElement('div');
+                storageBinSection.classList.add('storage-bin');
+                storageBinSection.setAttribute('data-storage-bin', bin["Storage Bin"]);
+                storageBinSection.innerHTML = `<h3>Storage Bin: ${bin["Storage Bin"]}</h3>`;
+                addProductsToBin(bin.products, storageBinSection);
+                binsContainer.appendChild(storageBinSection);
+            });
+
+            storageTypeElement.appendChild(binsContainer);
+        };
+
+        const groupedData = data.reduce((acc, item) => {
+            const storageType = item["Storage Type"];
+            const storageBin = item["Storage Bin"];
+            if (!acc[storageType]) {
+                acc[storageType] = {};
+            }
+            if (!acc[storageType][storageBin]) {
+                acc[storageType][storageBin] = [];
+            }
+            acc[storageType][storageBin].push(item);
+            return acc;
+        }, {});
+
+        const storageTypes = Object.keys(groupedData);
+
+        storageTypes.forEach(storageType => {
+            const storageTypeSection = document.createElement('div');
+            storageTypeSection.classList.add('storage-type');
+            storageTypeSection.setAttribute('data-storage-type', storageType);
+            storageTypeSection.innerHTML = `<h2>Storage Type: ${storageType}</h2>`;
+
+            const bins = Object.keys(groupedData[storageType]).map(bin => ({
+                "Storage Bin": bin,
+                products: groupedData[storageType][bin]
+            }));
+
+            addBinsToStorageType(bins, storageTypeSection);
+            container.appendChild(storageTypeSection);
+        });
+
+        const scrollContainer = document.getElementById('scroll-container');
+        let isDown = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.style.cursor = 'grabbing';
+            startX = e.pageX - scrollContainer.offsetLeft;
+            startY = e.pageY - scrollContainer.offsetTop;
+            scrollLeft = scrollContainer.scrollLeft;
+            scrollTop = scrollContainer.scrollTop;
+        });
+
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+            scrollContainer.style.cursor = 'grab';
+        });
+
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+            scrollContainer.style.cursor = 'grab';
+        });
+
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const y = e.pageY - scrollContainer.offsetTop;
+            const walkX = (x - startX) * 1; //scroll-fast
+            const walkY = (y - startY) * 1; //scroll-fast
+            scrollContainer.scrollLeft = scrollLeft - walkX;
+            scrollContainer.scrollTop = scrollTop - walkY;
+        });
+
+        const highlightElement = (element, className, searchValue, exactMatch) => {
+            const content = element.getAttribute('data-storage-type') || element.getAttribute('data-storage-bin') || element.getAttribute('data-product');
+            if (exactMatch) {
+                if (content === searchValue) {
+                    element.classList.add(className);
+                } else {
+                    element.classList.remove(className);
+                }
+            } else {
+                if (content.includes(searchValue)) {
+                    element.classList.add(className);
+                } else {
+                    element.classList.remove(className);
+                }
+            }
+        };
+
+        document.getElementById('search-storage-type').addEventListener('input', function() {
+            const searchValue = this.value.trim();
+            const exactMatch = !searchValue.startsWith('*');
+            const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
+            document.querySelectorAll('.storage-type').forEach(type => {
+                highlightElement(type, 'highlight', searchTerm, exactMatch);
+            });
+        });
+
+        document.getElementById('search-storage-bin').addEventListener('input', function() {
+            const searchValue = this.value.trim();
+            const exactMatch = !searchValue.startsWith('*');
+            const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
+            document.querySelectorAll('.storage-bin').forEach(bin => {
+                highlightElement(bin, 'highlight-bin', searchTerm, exactMatch);
+            });
+        });
+
+        document.getElementById('search-product').addEventListener('input', function() {
+            const searchValue = this.value.trim();
+            const exactMatch = !searchValue.startsWith('*');
+            const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
+            document.querySelectorAll('.product').forEach(product => {
+                highlightElement(product, 'highlight-product', searchTerm, exactMatch);
+            });
+        });
+    </script>
+</body>
+</html>

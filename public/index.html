@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal2D.css">
     <link rel="stylesheet" href="css/modal.css">
 </head>
 
@@ -62,10 +63,36 @@
         <div class="model-modal-content">
             <span class="modal-close">&times;</span>
             <div class="model-canvas-container">
-                <canvas id="modalCanvas"  width="800" height="600"></canvas>
+                <canvas id="modalCanvas" width="800" height="600"></canvas>
             </div>
         </div>
     </div>
+
+    <!-- <div id="Modal2D" style="display: none;">
+        <div class="search-container">
+            <input type="text" id="search-storage-type" placeholder="Search Storage Type">
+            <input type="text" id="search-storage-bin" placeholder="Search Storage Bin">
+            <input type="text" id="search-product" placeholder="Search Product">
+        </div>
+        <span class="modal-close-2D">&times;</span>
+        <div id="scroll-container">
+            <div id="container" width="800" height="600"></div>
+        </div>
+    </div> -->
+    <div id="Modal2D" style="display: none;">
+        <div class="modal-content-2D">
+            <span class="modal-close-2D">&times;</span>
+            <div class="search-container">
+                <input type="text" id="search-storage-type" placeholder="Search Storage Type">
+                <input type="text" id="search-storage-bin" placeholder="Search Storage Bin">
+                <input type="text" id="search-product" placeholder="Search Product">
+            </div>
+            <div id="scroll-container">
+                <div id="container" width="800" height="600"></div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="footerConfigPanel" class="footer-panel">
         <div id="footerToggle" class="footer-toggle">&#x25B2; Configurations</div>
@@ -73,7 +100,8 @@
             <button class="modal-close" id="footerClose">&times;</button>
             <h3>Page Configurations</h3>
             <form>
-                <input id="urlInputFooter" type="text" placeholder="Url - https://" value="https://services.odata.org/northwind/northwind.svc">
+                <input id="urlInputFooter" type="text" placeholder="Url - https://"
+                    value="https://services.odata.org/northwind/northwind.svc">
                 <input id="endpointFooter" type="text" placeholder="Endpoint" value="Orders">
                 <button type="button" id="sendButton">Get</button>
             </form>

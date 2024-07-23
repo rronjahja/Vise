@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { camera, controls, renderer, scene, planeMesh, loader } from './scene.js';
 import { showModal } from './modal.js';
 import { animateTruck } from './animate.js';
-import { showMessage } from './messageModule.js';
+import { showModal2D } from './modal2D.js';
 
 let isDragging = false;
 let selectedObject = null;
@@ -101,11 +101,15 @@ renderer.domElement.addEventListener('dblclick', function (event) {
             while (selectedObject.parent !== null && selectedObject.parent !== scene) {
                 selectedObject = selectedObject.parent;
             }
-            if (view3DCheckbox.checked) {
+            if (view3DCheckbox.checked && selectedObject.userData.type === "hangar") {
+                // console.log("Here checked")
             showModal(selectedObject.userData);
         }
         else{
-            // showModal(selectedObject.userData);
+            // console.log("Here")
+            if (selectedObject.userData.type === "hangar") {
+            showModal2D(selectedObject.userData);
+            }
         }
     }
 

@@ -21,6 +21,7 @@ export const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 planeMesh.rotation.x = -Math.PI / 2;
 scene.add(planeMesh);
 
+// Removed GridHelper
 const gridHelper = new THREE.GridHelper(500, 100);
 scene.add(gridHelper);
 
@@ -33,9 +34,21 @@ const pointLight = new THREE.PointLight(0xffffff, 1, 100); // color, intensity, 
 pointLight.position.set(10, 10, 10); // Adjust position as needed
 scene.add(pointLight);
 
-// Optional: Add a PointLightHelper to visualize the light position
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 1); // size of the helper
-scene.add(pointLightHelper);
+// Removed PointLightHelper
+// const pointLightHelper = new THREE.PointLightHelper(pointLight, 1); // size of the helper
+// scene.add(pointLightHelper);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // color, intensity
+scene.add(ambientLight);
+
+const spotLight = new THREE.SpotLight(0xffffff, 1); // color, intensity
+spotLight.position.set(15, 40, 35); // Adjust position as needed
+spotLight.castShadow = true; // Enable shadows
+scene.add(spotLight);
+
+// Removed SpotLightHelper
+// const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+// scene.add(spotLightHelper);
 
 export function animate() {
     requestAnimationFrame(animate);
