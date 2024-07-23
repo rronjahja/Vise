@@ -4335,20 +4335,17 @@ export function showModal2D(userData) {
         }
       ];
 
-    const createGridStyle = (count) => {
+      const createGridStyle = (count) => {
         if (count <= 3) return `repeat(${count}, 1fr)`;
         const gridSize = Math.ceil(Math.sqrt(count));
         return `repeat(${gridSize}, 1fr)`;
     };
 
     const addProductsToBin = (products, binElement) => {
-        if (products.length > 3) {
-            const gridStyle = createGridStyle(products.length);
-            binElement.style.display = 'grid';
-            binElement.style.gridTemplateColumns = gridStyle;
-        } else {
-            binElement.style.display = 'block';
-        }
+        const gridStyle = createGridStyle(products.length);
+        binElement.style.display = 'grid';
+        binElement.style.gridTemplateColumns = gridStyle;
+        binElement.style.gap = '10px'; // Add some gap between products for better visibility
 
         products.forEach(product => {
             const productDiv = document.createElement('div');
@@ -4356,7 +4353,6 @@ export function showModal2D(userData) {
             productDiv.setAttribute('data-product', product.Product);
             productDiv.innerHTML = `
                 <p>Product: ${product.Product}</p>
-                
                 <p>Quantity: ${product.Quantity} ${product["Base Unit of Measure"]}</p>
                 <p>Weight: ${product["Loading Weight"]} ${product["Weight Unit"]}</p>
             `;
@@ -4447,49 +4443,90 @@ export function showModal2D(userData) {
         scrollContainer.scrollTop = scrollTop - walkY;
     });
 
-    const highlightElement = (element, className, searchValue, exactMatch) => {
-        const content = element.getAttribute('data-storage-type') || element.getAttribute('data-storage-bin') || element.getAttribute('data-product');
-        if (exactMatch) {
-            if (content === searchValue) {
+    const highlightElements = (elements, className, searchTerm, exactMatch) => {
+        let anyMatch = false;
+        elements.forEach(element => {
+            const content = element.getAttribute('data-storage-type') || element.getAttribute('data-storage-bin') || element.getAttribute('data-product');
+            if (exactMatch ? content === searchTerm : content.includes(searchTerm)) {
                 element.classList.add(className);
+                element.style.display = 'block'; // Show the element
+                anyMatch = true;
             } else {
                 element.classList.remove(className);
+                element.style.display = 'none'; // Hide the element
             }
-        } else {
-            if (content.includes(searchValue)) {
-                element.classList.add(className);
-            } else {
-                element.classList.remove(className);
-            }
-        }
+        });
+        return anyMatch;
     };
 
-    document.getElementById('search-storage-type').addEventListener('input', function() {
-        const searchValue = this.value.trim();
-        const exactMatch = !searchValue.startsWith('*');
-        const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
-        document.querySelectorAll('.storage-type').forEach(type => {
-            highlightElement(type, 'highlight', searchTerm, exactMatch);
+    const resetElementVisibility = () => {
+        document.querySelectorAll('.storage-type, .storage-bin, .product').forEach(element => {
+            element.style.display = 'block';
         });
-    });
+    };
 
-    document.getElementById('search-storage-bin').addEventListener('input', function() {
-        const searchValue = this.value.trim();
-        const exactMatch = !searchValue.startsWith('*');
-        const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
-        document.querySelectorAll('.storage-bin').forEach(bin => {
-            highlightElement(bin, 'highlight-bin', searchTerm, exactMatch);
-        });
-    });
+    const hideEmptyStorageTypesAndBins = () => {
+        const storageTypes = document.querySelectorAll('.storage-type');
+        storageTypes.forEach(storageType => {
+            const bins = storageType.querySelectorAll('.storage-bin');
+            const anyBinVisible = Array.from(bins).some(bin => bin.style.display !== 'none');
+            if (anyBinVisible) {
+                storageType.style.display = 'block'; // Show storage type if any bin is visible
+            } else {
+                storageType.style.display = 'none'; // Hide storage type if no bins are visible
+            }
 
-    document.getElementById('search-product').addEventListener('input', function() {
-        const searchValue = this.value.trim();
-        const exactMatch = !searchValue.startsWith('*');
-        const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
-        document.querySelectorAll('.product').forEach(product => {
-            highlightElement(product, 'highlight-product', searchTerm, exactMatch);
+            bins.forEach(bin => {
+                const products = bin.querySelectorAll('.product');
+                const anyProductVisible = Array.from(products).some(product => product.style.display !== 'none');
+                if (anyProductVisible) {
+                    bin.style.display = 'block'; // Show bin if any product is visible
+                } else {
+                    bin.style.display = 'none'; // Hide bin if no products are visible
+                }
+            });
         });
-    });
+    };
+
+    const searchAndHighlight = (inputId, className, selector, relatedSelectors = []) => {
+        document.getElementById(inputId).addEventListener('input', function() {
+            resetElementVisibility(); // Reset all elements to visible before applying the new search filter
+
+            const searchValue = this.value.trim();
+            const exactMatch = !searchValue.startsWith('*');
+            const searchTerm = exactMatch ? searchValue : searchValue.slice(1).trim();
+
+            const elements = document.querySelectorAll(selector);
+            const anyMatch = highlightElements(elements, className, searchTerm, exactMatch);
+
+            relatedSelectors.forEach(related => {
+                const relatedElements = document.querySelectorAll(related.selector);
+                relatedElements.forEach(element => {
+                    const matches = Array.from(element.querySelectorAll(related.childSelector)).some(child =>
+                        exactMatch ? child.getAttribute(related.dataAttr) === searchTerm : child.getAttribute(related.dataAttr).includes(searchTerm)
+                    );
+                    if (matches || anyMatch) {
+                        element.style.display = 'block'; // Show the related element
+                    } else {
+                        element.style.display = 'none'; // Hide the related element
+                    }
+                });
+            });
+
+            if (inputId === 'search-storage-bin' || inputId === 'search-product') {
+                hideEmptyStorageTypesAndBins();
+            }
+        });
+    };
+
+    searchAndHighlight('search-storage-type', 'highlight', '.storage-type', []);
+    searchAndHighlight('search-storage-bin', 'highlight-bin', '.storage-bin', [
+        { selector: '.storage-type', childSelector: '.storage-bin', dataAttr: 'data-storage-bin' }
+    ]);
+    searchAndHighlight('search-product', 'highlight-product', '.product', [
+        { selector: '.storage-bin', childSelector: '.product', dataAttr: 'data-product' },
+        { selector: '.storage-type', childSelector: '.storage-bin', dataAttr: 'data-storage-bin' }
+    ]);
 
     // Display the modal
     modal.style.display = 'block';
@@ -4508,5 +4545,4 @@ export function showModal2D(userData) {
             modal.style.display = 'none';
         }
     };
-    
 }
