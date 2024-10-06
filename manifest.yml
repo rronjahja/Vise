@@ -1,0 +1,8 @@
+---
+applications:
+  - name: vise-frontend
+    path: ./public  # Path to your build directory
+    memory: 64M
+    buildpacks:
+      - staticfile_buildpack
+    random-route: true

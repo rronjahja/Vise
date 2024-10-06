@@ -1,0 +1,8 @@
+---
+applications:
+- name: vise-backend
+  path: backend
+  memory: 128M
+  buidpack: https://github.com/cloudfoundry/nodejs-buildpack.git#v1.8.9
+  disk_quota: 1024M
+  instances: 1

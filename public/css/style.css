@@ -160,6 +160,7 @@ body, html {
     text-align: center;
     transition: transform 0.3s ease;
     transform: translateY(100%);
+    z-index: 1000;
 }
 
 .footer-panel.expanded {
@@ -170,17 +171,57 @@ body, html {
     padding: 10px;
     background-color: #444;
     cursor: pointer;
-    user-select: none;
+    color: white;
+    font-weight: bold;
 }
 
 .footer-content {
     display: none;
     padding: 20px;
+    background-color: #2c2c2c;
+    color: white;
 }
 
 .footer-panel.expanded .footer-content {
     display: block;
 }
+
+.form {
+    margin-top: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #444;
+    color: white;
+}
+
+.input-group input::placeholder {
+    color: #bbb;
+}
+
+button[type="button"] {
+    padding: 10px 20px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="button"]:hover {
+    background-color: #666;
+}
+
 
 /* 3D Model Modal styling */
 .model-modal {

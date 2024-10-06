@@ -127,6 +127,7 @@ function onDrop(event, modelType) {
 
     if (intersects.length > 0) {
         const point = intersects[0].point;
+        console.log(point);
         const modelData = getModelData(modelType);
         console.log("Model data:", modelData);
         if (modelData.fileName) {

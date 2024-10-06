@@ -1,0 +1,9 @@
+
+###
+POST http://localhost:8080/fetch-url
+Content-Type: application/json
+Authorization: Basic UzRIQ19VU0VSMjpjfmNaUU5NWUJoZWd6aUZBbUdSQ0tsYm1aZWtyMkdtdWhva0JuQUhi
+
+{
+  "url": "https://my403426-api.s4hana.cloud.sap/sap/opu/odata4/sap/api_whse_availablestock/srvd_a2x/sap/warehouseavailablestock/0001/WarehouseAvailableStock"
+}

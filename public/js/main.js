@@ -26,20 +26,21 @@ function submitModalData() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const footerPanel = document.getElementById('footerConfigPanel');
-    const footerToggle = document.getElementById('footerToggle');
-    const footerClose = document.getElementById('footerClose');
-    const configButton = document.getElementById('configButton');
-
-    footerToggle.addEventListener('click', function () {
-        footerPanel.classList.toggle('expanded');
-    });
-
-    footerClose.addEventListener('click', function () {
-        footerPanel.classList.remove('expanded');
-    });
-
-    configButton.addEventListener('click', function () {
-        footerPanel.classList.add('expanded');
-    });
+    const footerPanel = document.getElementById('footerPanel');
+    const footerToggle = document.querySelector('.footer-toggle');
+    
+    // Check if both the footer panel and toggle button exist before proceeding
+    if (footerPanel && footerToggle) {
+        // Add a click event listener to the footer toggle button
+        footerToggle.addEventListener('click', function () {
+            // Manually toggle the 'expanded' class
+            if (footerPanel.className.includes('expanded')) {
+                footerPanel.className = footerPanel.className.replace('expanded', '').trim();
+            } else {
+                footerPanel.className += ' expanded';
+            }
+        });
+    } else {
+        console.error('Footer panel or toggle button not found!');
+    }
 });

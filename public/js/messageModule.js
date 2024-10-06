@@ -41,17 +41,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (url && endpoint) {
             if (fieldName.trim() === 'Order') {
                 try {
-                    const response = await fetch('http://localhost:3000/fetch-url', {
+                    const response = await fetch('https://vise-backend-sleepy-leopard-to.cfapps.eu20-001.hana.ondemand.com/fetch-url', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Test123'
+                        },
                         body: JSON.stringify({ url: fullUrl })
                     });
                     const orderData = await response.json();
 
                     const orderDetailsUrl = `${url}/Order_Details?$filter=OrderID eq ${fieldValue}`;
-                    const response2 = await fetch('http://localhost:3000/fetch-url', {
+                    const response2 = await fetch('https://vise-backend-sleepy-leopard-to.cfapps.eu20-001.hana.ondemand.com/fetch-url', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Test123'
+                        },
                         body: JSON.stringify({ url: orderDetailsUrl })
                     });
                     const orderDetailsData = await response2.json();
@@ -72,9 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
     async function fetchProductDetails(baseUrl, orderDetails) {
         const productDetailsPromises = orderDetails.map(async item => {
             const productUrl = `${baseUrl}/Products?$filter=ProductID eq ${item.ProductID}`;
-            const response = await fetch('http://localhost:3000/fetch-url', {
+            const response = await fetch('https://vise-backend-sleepy-leopard-to.cfapps.eu20-001.hana.ondemand.com/fetch-url', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Test123'
+                },
                 body: JSON.stringify({ url: productUrl })
             });
             const productData = await response.json();

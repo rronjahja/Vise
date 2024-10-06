@@ -8,19 +8,33 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modal2D.css">
     <link rel="stylesheet" href="css/modal.css">
+    <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-libs="sap.m"
+    data-sap-ui-theme="sap_fiori_3"
+    data-sap-ui-async="true">
+</script>
+
 </head>
 
 <body>
-    <div id="navbar">
-        <!-- Navbar content -->
-        <a href="#">Home</a>
-        <a href="#" id="configButton">Config</a>
-        <button style="width:auto;background-color:darkslategrey;" id="simulateButton">Simulate</button>
-        <button style="width:auto;background-color:steelblue;" id="scanPdfBtn">Scan PDF</button>
-        <label for="view3DCheckbox"> 3D</label>
-        <input type="checkbox" id="view3DCheckbox">
-        <!-- More navbar items -->
-    </div>
+
+    
+    <div id="app"></div>
+    
+
+
+<div id="navbar">
+    <!-- Navbar content -->
+    <a href="#">Home</a>
+    <a href="#" id="configButton">Config</a>
+    <button style="width:auto;background-color:darkslategrey;" id="simulateButton">Simulate</button>
+    <button style="width:auto;background-color:steelblue;" id="scanPdfBtn">Scan PDF</button>
+    <label for="view3DCheckbox"> 3D</label>
+    <input type="checkbox" id="view3DCheckbox">
+    <!-- More navbar items -->
+</div>
 
     <div id="sidebar">
         <button id="toggle-sidebar">&#x3c;</button>
@@ -100,13 +114,26 @@
             <button class="modal-close" id="footerClose">&times;</button>
             <h3>Page Configurations</h3>
             <form>
-                <input id="urlInputFooter" type="text" placeholder="Url - https://"
-                    value="https://services.odata.org/northwind/northwind.svc">
-                <input id="endpointFooter" type="text" placeholder="Endpoint" value="Orders">
+                <!-- First Group of Inputs -->
+                <div class="input-group">
+                    <input id="urlInputFooter" type="text" placeholder="Url - https://"
+                        value="https://services.odata.org/northwind/northwind.svc">
+                    <input id="endpointFooter" type="text" placeholder="Endpoint" value="Orders">
+                </div>
+    
+                <!-- New Group of Inputs for Destination -->
+                <div class="input-group">
+                    <input id="destinationUrlInput" type="text" placeholder="Destination URL - https://" value="https://my123456-api.s4hana.cloud.sap/sap/opu/odata4/sap/api_whse_availablestock/srvd_a2x/sap/warehouseavailablestock/0001">
+                    <input id="destinationEndpointInput" type="text" placeholder="Destination Endpoint" value="WarehouseAvailableStock">
+                    <input id="destinationUsernameInput" type="text" placeholder="Destination Username">
+                    <input id="destinationPasswordInput" type="password" placeholder="Destination Password">
+                </div>
+    
                 <button type="button" id="sendButton">Get</button>
             </form>
         </div>
     </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/controls/OrbitControls.js"></script>
